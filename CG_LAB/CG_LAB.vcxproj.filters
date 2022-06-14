@@ -39,5 +39,11 @@
     <ClCompile Include="Lab10_Animation.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
+    <ClCompile Include="glframe.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="gltools.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

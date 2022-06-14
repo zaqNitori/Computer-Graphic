@@ -143,6 +143,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="glframe.cpp" />
+    <ClCompile Include="gltools.cpp" />
     <ClCompile Include="Lab06_Rasterization_Line.cpp" />
     <ClCompile Include="Lab07_Texture.cpp" />
     <ClCompile Include="Lab08_SubDivision.cpp" />
