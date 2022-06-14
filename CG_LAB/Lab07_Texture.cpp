@@ -252,7 +252,7 @@
 //	glGenTextures(4, textures);
 //
 //	// Load the texture objects
-//	image = imread("..\\material\\lab07\\floor.jpg");
+//	image = imread("./material/lab07/floor.jpg");
 //	glBindTexture(GL_TEXTURE_2D, textures[0]);
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -261,7 +261,7 @@
 //	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.cols, image.rows, 0,
 //		GL_BGR_EXT, GL_UNSIGNED_BYTE, image.ptr());
 //
-//	image = imread("..\\material\\lab07\\Block6.jpg");
+//	image = imread("./material/lab07/Block6.jpg");
 //	glBindTexture(GL_TEXTURE_2D, textures[1]);
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -270,7 +270,7 @@
 //	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.cols, image.rows, 0,
 //		GL_BGR_EXT, GL_UNSIGNED_BYTE, image.ptr());
 //
-//	image = imread("..\\material\\lab07\\Block5.jpg");
+//	image = imread("./material/lab07/Block5.jpg");
 //	glBindTexture(GL_TEXTURE_2D, textures[2]);
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -279,7 +279,7 @@
 //	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.cols, image.rows, 0,
 //		GL_BGR_EXT, GL_UNSIGNED_BYTE, image.ptr());
 //
-//	image = imread("..\\material\\lab07\\Block4.jpg");
+//	image = imread("./material/lab07/Block4.jpg");
 //	glBindTexture(GL_TEXTURE_2D, textures[3]);
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
