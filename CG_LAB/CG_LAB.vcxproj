@@ -147,6 +147,7 @@
     <ClCompile Include="Lab07_Texture.cpp" />
     <ClCompile Include="Lab08_SubDivision.cpp" />
     <ClCompile Include="Lab09_Shadow.cpp" />
+    <ClCompile Include="Lab10_Animation.cpp" />
     <ClCompile Include="Lab5_2D_Grid.cpp" />
     <ClCompile Include="math3d.cpp" />
     <ClCompile Include="Midterm_Rasterization_Polygon.cpp" />

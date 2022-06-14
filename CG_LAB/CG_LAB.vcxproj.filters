@@ -36,5 +36,8 @@
     <ClCompile Include="math3d.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
+    <ClCompile Include="Lab10_Animation.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
