@@ -45,6 +45,7 @@ GLfloat luaRotateZ, lfaRotateZ;
 GLfloat ruaRotateZ, rfaRotateZ;
 GLfloat lulRotateZ, ldlRotateZ;
 GLfloat rulRotateZ, rdlRotateZ;
+GLfloat torsoMoveX, torsoMoveY;
 
 void initPosition()
 {
@@ -60,6 +61,7 @@ void initPosition()
 	legHeight = 25;
 	legWidth = 10;
 
+	torsoMoveX = torsoMoveY = 0;
 	luaRotateY = lfaRotateY = ruaRotateY = rfaRotateY = lulRotateY = ldlRotateY = rulRotateY = rdlRotateY = 0;
 	luaRotateZ = lfaRotateZ = ruaRotateZ = rfaRotateZ = lulRotateZ = ldlRotateZ = rulRotateZ = rdlRotateZ = 0;
 	luaRotateX = lfaRotateX = ruaRotateX = rfaRotateX = lulRotateX = ldlRotateX = rulRotateX = rdlRotateX = 0;
@@ -471,7 +473,7 @@ void RenderScene(void)
 	//Draw Start
 	{
 		glPushMatrix();
-		glTranslatef(0, 0, 0);
+		glTranslatef(torsoMoveX, torsoMoveY, 0);
 
 		//Head
 		{
@@ -538,9 +540,6 @@ void RenderScene(void)
 			{
 				glPushMatrix();
 				glTranslatef(-armWidth / 2, -jointRadius - armHeight, 0);
-				glRotatef(rfaRotateX, 1, 0, 0);
-				glRotatef(rfaRotateY, 0, 1, 0);
-				glRotatef(rfaRotateZ, 0, 0, 1);
 
 				drawArm();
 
@@ -549,6 +548,9 @@ void RenderScene(void)
 					glPushMatrix();
 
 					glTranslatef(+jointRadius, -jointRadius, 0);
+					glRotatef(rfaRotateX, 1, 0, 0);
+					glRotatef(rfaRotateY, 0, 1, 0);
+					glRotatef(rfaRotateZ, 0, 0, 1);
 					drawJoint();
 
 					{
@@ -580,9 +582,6 @@ void RenderScene(void)
 			{
 				glPushMatrix();
 				glTranslatef(-legWidth / 2, -jointRadius - legHeight, 0);
-				glRotatef(ldlRotateX, 1, 0, 0);
-				glRotatef(ldlRotateY, 0, 1, 0);
-				glRotatef(ldlRotateZ, 0, 0, 1);
 
 				drawLeg();
 
@@ -590,6 +589,10 @@ void RenderScene(void)
 				{
 					glPushMatrix();
 					glTranslatef(legWidth / 2, -jointRadius, 0);
+					glRotatef(ldlRotateX, 1, 0, 0);
+					glRotatef(ldlRotateY, 0, 1, 0);
+					glRotatef(ldlRotateZ, 0, 0, 1);
+
 					drawJoint();
 
 					{
@@ -622,9 +625,6 @@ void RenderScene(void)
 			{
 				glPushMatrix();
 				glTranslatef(-legWidth / 2, -jointRadius - legHeight, 0);
-				glRotatef(rdlRotateX, 1, 0, 0);
-				glRotatef(rdlRotateY, 0, 1, 0);
-				glRotatef(rdlRotateZ, 0, 0, 1);
 
 				drawLeg();
 
@@ -632,6 +632,10 @@ void RenderScene(void)
 				{
 					glPushMatrix();
 					glTranslatef(legWidth / 2, -jointRadius, 0);
+					glRotatef(rdlRotateX, 1, 0, 0);
+					glRotatef(rdlRotateY, 0, 1, 0);
+					glRotatef(rdlRotateZ, 0, 0, 1);
+
 					drawJoint();
 
 					{
@@ -787,6 +791,7 @@ void KeyPressFunc(unsigned char key, int x, int y)
 		rdlRotateZ += shift;
 		break;
 	case 'r':
+		torsoMoveX = torsoMoveY = 0;
 		luaRotateY = lfaRotateY = ruaRotateY = rfaRotateY = lulRotateY = ldlRotateY = rulRotateY = rdlRotateY = 0;
 		luaRotateZ = lfaRotateZ = ruaRotateZ = rfaRotateZ = lulRotateZ = ldlRotateZ = rulRotateZ = rdlRotateZ = 0;
 		luaRotateX = lfaRotateX = ruaRotateX = rfaRotateX = lulRotateX = ldlRotateX = rulRotateX = rdlRotateX = 0;
@@ -799,6 +804,28 @@ void KeyPressFunc(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
+void mySpecialKey(int key, int x, int y)
+{
+    float shift = 4.0f;
+    switch (key)
+    {
+    case GLUT_KEY_LEFT:
+        torsoMoveX -= shift;
+        break;
+    case GLUT_KEY_RIGHT:
+		torsoMoveX += shift;
+        break;
+    case GLUT_KEY_UP:
+		torsoMoveY += shift;
+        break;
+    case GLUT_KEY_DOWN:
+		torsoMoveY -= shift;
+        break;
+    default:
+        break;
+    }
+    glutPostRedisplay();
+}
 
 void ChangeSize(int w, int h)
 {
@@ -851,6 +878,7 @@ int main(int argc, char* argv[])
 	glutReshapeFunc(ChangeSize);
 	glutKeyboardFunc(KeyPressFunc);
 	glutDisplayFunc(RenderScene);
+	glutSpecialFunc(mySpecialKey);
 
 	SetupRC();
 
