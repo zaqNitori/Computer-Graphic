@@ -2010,289 +2010,768 @@
 //
 //const std::string szTextureFiles[] = {"grass.tga", "wood.tga", "orb.tga"};
 //
-//        
+//     
+//
+//GLfloat torsoWidth, torsoHeight;
+//GLfloat headRadius, jointRadius;
+//GLfloat armHeight, armWidth;
+//GLfloat legHeight, legWidth;
+//
+//GLfloat luaRotateX, lfaRotateX;
+//GLfloat ruaRotateX, rfaRotateX;
+//GLfloat lulRotateX, ldlRotateX;
+//GLfloat rulRotateX, rdlRotateX;
+//GLfloat luaRotateY, lfaRotateY;
+//GLfloat ruaRotateY, rfaRotateY;
+//GLfloat lulRotateY, ldlRotateY;
+//GLfloat rulRotateY, rdlRotateY;
+//GLfloat luaRotateZ, lfaRotateZ;
+//GLfloat ruaRotateZ, rfaRotateZ;
+//GLfloat lulRotateZ, ldlRotateZ;
+//GLfloat rulRotateZ, rdlRotateZ;
+//GLfloat torsoMoveX, torsoMoveY;
+//
+//void initPosition()
+//{
+//	/*headRadius = 15;
+//	jointRadius = 5;
+//
+//	torsoHeight = 50.0f;
+//	torsoWidth = 30.0f;
+//
+//	armHeight = 20;
+//	armWidth = 8;
+//
+//	legHeight = 25;
+//	legWidth = 10;*/
+//
+//	headRadius = .3;
+//	jointRadius = .1;
+//
+//	torsoHeight = .5f;
+//	torsoWidth = .5;
+//
+//	armHeight = .5;
+//	armWidth = .2;
+//
+//	legHeight = .5;
+//	legWidth = .2;
+//
+//	torsoMoveX = torsoMoveY = 0;
+//	luaRotateY = lfaRotateY = ruaRotateY = rfaRotateY = lulRotateY = ldlRotateY = rulRotateY = rdlRotateY = 0;
+//	luaRotateZ = lfaRotateZ = ruaRotateZ = rfaRotateZ = lulRotateZ = ldlRotateZ = rulRotateZ = rdlRotateZ = 0;
+//	luaRotateX = lfaRotateX = ruaRotateX = rfaRotateX = lulRotateX = ldlRotateX = rulRotateX = rdlRotateX = 0;
+//}
+//
 ////////////////////////////////////////////////////////////////////
 //// This function does any needed initialization on the rendering
 //// context. 
 //void SetupRC()
-//    {
-//    M3DVector3f vPoints[3] = {{ 0.0f, -0.4f, 0.0f },
-//                             { 10.0f, -0.4f, 0.0f },
-//                             { 5.0f, -0.4f, -5.0f }};
-//    int iSphere;
-//    int i;
-//    
-//    // Grayish background
-//    glClearColor(fLowLight[0], fLowLight[1], fLowLight[2], fLowLight[3]);
-//   
-//    // Clear stencil buffer with zero, increment by one whenever anybody
-//    // draws into it. When stencil function is enabled, only write where
-//    // stencil value is zero. This prevents the transparent shadow from drawing
-//    // over itself
-//    glStencilOp(GL_INCR, GL_INCR, GL_INCR);
-//    glClearStencil(0);
-//    glStencilFunc(GL_EQUAL, 0x0, 0x01);
-//    
-//    // Cull backs of polygons
-//    glCullFace(GL_BACK);
-//    glFrontFace(GL_CCW);
-//    glEnable(GL_CULL_FACE);
-//    glEnable(GL_DEPTH_TEST);
-//    
-//    // Setup light parameters
-//    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, fNoLight);
-//    glLightfv(GL_LIGHT0, GL_AMBIENT, fLowLight);
-//    glLightfv(GL_LIGHT0, GL_DIFFUSE, fBrightLight);
-//    glLightfv(GL_LIGHT0, GL_SPECULAR, fBrightLight);
-//    glEnable(GL_LIGHTING);
-//    glEnable(GL_LIGHT0);
-//        
-//    // Calculate shadow matrix
-//    M3DVector4f pPlane;
-//    m3dGetPlaneEquation(pPlane, vPoints[0], vPoints[1], vPoints[2]);
-//    m3dMakePlanarShadowMatrix(mShadowMatrix, pPlane, fLightPos);
-//    
-//    // Mostly use material tracking
-//    glEnable(GL_COLOR_MATERIAL);
-//    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-//    glMaterialfv(GL_FRONT, GL_SPECULAR, fBrightLight);
-//    glMateriali(GL_FRONT, GL_SHININESS, 128);
-//  
-//    
-//    // Randomly place the sphere inhabitants
-//    for(iSphere = 0; iSphere < NUM_SPHERES; iSphere++)
-//        {
-//        // Pick a random location between -20 and 20 at .1 increments
-//        //spheres[iSphere].SetOrigin(((float)((rand() % 400) - 200) * 0.1f), 0.0, (float)((rand() % 400) - 200) * 0.1f);
-//        }
-//      
-//    // Set up texture maps
-//    glEnable(GL_TEXTURE_2D);
-//    glGenTextures(NUM_TEXTURES, textureObjects);
-//    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-//    
-//    
-//    for(i = 0; i < NUM_TEXTURES; i++)
-//        {
-//        //GLbyte *pBytes;
-//        GLint iWidth, iHeight, iComponents;
-//        GLenum eFormat;
-//        
-//        glBindTexture(GL_TEXTURE_2D, textureObjects[i]);
-//        
-//        // Load this texture map
-//		std::unique_ptr<GLbyte[]> pBytes = gltLoadTGA("./material/lab10/" + szTextureFiles[i], iWidth, iHeight, iComponents, eFormat);
-//        gluBuild2DMipmaps(GL_TEXTURE_2D, iComponents, iWidth, iHeight, eFormat, GL_UNSIGNED_BYTE, pBytes.get());
-//        //free(pBytes);
-//        
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-//        }
+//{
+//	M3DVector3f vPoints[3] = { { 0.0f, -0.4f, 0.0f },
+//							 { 10.0f, -0.4f, 0.0f },
+//							 { 5.0f, -0.4f, -5.0f } };
+//	int iSphere;
+//	int i;
 //
-//    }
+//	// Grayish background
+//	glClearColor(fLowLight[0], fLowLight[1], fLowLight[2], fLowLight[3]);
+//
+//	// Clear stencil buffer with zero, increment by one whenever anybody
+//	// draws into it. When stencil function is enabled, only write where
+//	// stencil value is zero. This prevents the transparent shadow from drawing
+//	// over itself
+//	glStencilOp(GL_INCR, GL_INCR, GL_INCR);
+//	glClearStencil(0);
+//	glStencilFunc(GL_EQUAL, 0x0, 0x01);
+//
+//	// Cull backs of polygons
+//	glCullFace(GL_BACK);
+//	glFrontFace(GL_CCW);
+//	glEnable(GL_CULL_FACE);
+//	glEnable(GL_DEPTH_TEST);
+//
+//	// Setup light parameters
+//	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, fNoLight);
+//	glLightfv(GL_LIGHT0, GL_AMBIENT, fLowLight);
+//	glLightfv(GL_LIGHT0, GL_DIFFUSE, fBrightLight);
+//	glLightfv(GL_LIGHT0, GL_SPECULAR, fBrightLight);
+//	glEnable(GL_LIGHTING);
+//	glEnable(GL_LIGHT0);
+//
+//	// Calculate shadow matrix
+//	M3DVector4f pPlane;
+//	m3dGetPlaneEquation(pPlane, vPoints[0], vPoints[1], vPoints[2]);
+//	m3dMakePlanarShadowMatrix(mShadowMatrix, pPlane, fLightPos);
+//
+//	// Mostly use material tracking
+//	glEnable(GL_COLOR_MATERIAL);
+//	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+//	glMaterialfv(GL_FRONT, GL_SPECULAR, fBrightLight);
+//	glMateriali(GL_FRONT, GL_SHININESS, 128);
+//
+//
+//	// Randomly place the sphere inhabitants
+//	for (iSphere = 0; iSphere < NUM_SPHERES; iSphere++)
+//	{
+//		// Pick a random location between -20 and 20 at .1 increments
+//		//spheres[iSphere].SetOrigin(((float)((rand() % 400) - 200) * 0.1f), 0.0, (float)((rand() % 400) - 200) * 0.1f);
+//	}
+//
+//	// Set up texture maps
+//	glEnable(GL_TEXTURE_2D);
+//	glGenTextures(NUM_TEXTURES, textureObjects);
+//	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+//
+//
+//	for (i = 0; i < NUM_TEXTURES; i++)
+//	{
+//		//GLbyte *pBytes;
+//		GLint iWidth, iHeight, iComponents;
+//		GLenum eFormat;
+//
+//		glBindTexture(GL_TEXTURE_2D, textureObjects[i]);
+//
+//		// Load this texture map
+//		std::unique_ptr<GLbyte[]> pBytes = gltLoadTGA("./material/lab10/" + szTextureFiles[i], iWidth, iHeight, iComponents, eFormat);
+//		gluBuild2DMipmaps(GL_TEXTURE_2D, iComponents, iWidth, iHeight, eFormat, GL_UNSIGNED_BYTE, pBytes.get());
+//		//free(pBytes);
+//
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+//	}
+//
+//}
 //
 //////////////////////////////////////////////////////////////////////////
 //// Do shutdown for the rendering context
 //void ShutdownRC(void)
-//    {
-//    // Delete the textures
-//    glDeleteTextures(NUM_TEXTURES, textureObjects);
-//    }
+//{
+//	// Delete the textures
+//	glDeleteTextures(NUM_TEXTURES, textureObjects);
+//}
 //
 //
 /////////////////////////////////////////////////////////////
 //// Draw the ground as a series of triangle strips
 //void DrawGround(void)
-//    {
-//    GLfloat fExtent = 20.0f;
-//    GLfloat fStep = 1.0f;
-//    GLfloat y = -0.4f;
-//    GLfloat iStrip, iRun;
-//    GLfloat s = 0.0f;
-//    GLfloat t = 0.0f;
-//    GLfloat texStep = 1.0f / (fExtent * .075f);
-//    
-//    glBindTexture(GL_TEXTURE_2D, textureObjects[GROUND_TEXTURE]);
-//    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//    
-//    for(iStrip = -fExtent; iStrip <= fExtent; iStrip += fStep)
-//        {
-//        t = 0.0f;
-//        glBegin(GL_TRIANGLE_STRIP);
+//{
+//	GLfloat fExtent = 20.0f;
+//	GLfloat fStep = 1.0f;
+//	GLfloat y = -0.4f;
+//	GLfloat iStrip, iRun;
+//	GLfloat s = 0.0f;
+//	GLfloat t = 0.0f;
+//	GLfloat texStep = 1.0f / (fExtent * .075f);
 //
-//            for(iRun = fExtent; iRun >= -fExtent; iRun -= fStep)
-//                {
-//                glTexCoord2f(s, t);
-//                glNormal3f(0.0f, 1.0f, 0.0f);   // All Point up
-//                glVertex3f(iStrip, y, iRun);
-//                
-//                glTexCoord2f(s + texStep, t);
-//                glNormal3f(0.0f, 1.0f, 0.0f);   // All Point up
-//                glVertex3f(iStrip + fStep, y, iRun);
-//                
-//                t += texStep;
-//                }
-//        glEnd();
-//        s += texStep;
-//        }
-//    }
+//	glBindTexture(GL_TEXTURE_2D, textureObjects[GROUND_TEXTURE]);
+//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//
+//	for (iStrip = -fExtent; iStrip <= fExtent; iStrip += fStep)
+//	{
+//		t = 0.0f;
+//		glBegin(GL_TRIANGLE_STRIP);
+//
+//		for (iRun = fExtent; iRun >= -fExtent; iRun -= fStep)
+//		{
+//			glTexCoord2f(s, t);
+//			glNormal3f(0.0f, 1.0f, 0.0f);   // All Point up
+//			glVertex3f(iStrip, y, iRun);
+//
+//			glTexCoord2f(s + texStep, t);
+//			glNormal3f(0.0f, 1.0f, 0.0f);   // All Point up
+//			glVertex3f(iStrip + fStep, y, iRun);
+//
+//			t += texStep;
+//		}
+//		glEnd();
+//		s += texStep;
+//	}
+//}
 //
 /////////////////////////////////////////////////////////////////////////
 //// Draw random inhabitants and the rotating torus/sphere duo
 //void DrawInhabitants(GLint nShadow)
-//    {
-//    static GLfloat yRot = 0.0f;         // Rotation angle for animation
-//    GLint i;
+//{
+//	static GLfloat yRot = 0.0f;         // Rotation angle for animation
+//	GLint i;
 //
-//    if(nShadow == 0)
-//        {
-//        yRot += 0.5f;
-//        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-//        }
-//    else
-//        glColor4f(0.00f, 0.00f, 0.00f, .6f);  // Shadow color
-//  
-//        
-//    // Draw the randomly located spheres
-//    glBindTexture(GL_TEXTURE_2D, textureObjects[SPHERE_TEXTURE]);
-//    for(i = 0; i < NUM_SPHERES; i++)
-//        {
-//        glPushMatrix();
-//        //spheres[i].ApplyActorTransform();
-//        gltDrawSphere(0.3f, 21, 11);
-//        glPopMatrix();
-//        }
+//	if (nShadow == 0)
+//	{
+//		yRot += 0.5f;
+//		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+//	}
+//	else
+//		glColor4f(0.00f, 0.00f, 0.00f, .6f);  // Shadow color
 //
-//    glPushMatrix();
-//        glTranslatef(0.0f, 0.1f, -2.5f);
-//    
-//        glPushMatrix();
-//            glRotatef(-yRot * 2.0f, 0.0f, 1.0f, 0.0f);
-//            glTranslatef(1.0f, 0.0f, 0.0f);
-//            gltDrawSphere(0.1f,21, 11);
-//        glPopMatrix();
-//    
-//        if(nShadow == 0)
-//            {
-//            // Torus alone will be specular
-//            glMaterialfv(GL_FRONT, GL_SPECULAR, fBrightLight);
-//            }
-//        
-//        glRotatef(yRot, 0.0f, 1.0f, 0.0f);
-//        glBindTexture(GL_TEXTURE_2D, textureObjects[TORUS_TEXTURE]);
-//        gltDrawTorus(0.35, 0.15, 61, 37);
-//        glMaterialfv(GL_FRONT, GL_SPECULAR, fNoLight);
-//    glPopMatrix();
-//    }
 //
-//        
+//	// Draw the randomly located spheres
+//	glBindTexture(GL_TEXTURE_2D, textureObjects[SPHERE_TEXTURE]);
+//	for (i = 0; i < NUM_SPHERES; i++)
+//	{
+//		glPushMatrix();
+//		//spheres[i].ApplyActorTransform();
+//		gltDrawSphere(0.3f, 21, 11);
+//		glPopMatrix();
+//	}
+//
+//	glPushMatrix();
+//	glTranslatef(0.0f, 0.1f, -2.5f);
+//
+//	glPushMatrix();
+//	glRotatef(-yRot * 2.0f, 0.0f, 1.0f, 0.0f);
+//	glTranslatef(1.0f, 0.0f, 0.0f);
+//	gltDrawSphere(0.1f, 21, 11);
+//	glPopMatrix();
+//
+//	if (nShadow == 0)
+//	{
+//		// Torus alone will be specular
+//		glMaterialfv(GL_FRONT, GL_SPECULAR, fBrightLight);
+//	}
+//
+//	glRotatef(yRot, 0.0f, 1.0f, 0.0f);
+//	glBindTexture(GL_TEXTURE_2D, textureObjects[TORUS_TEXTURE]);
+//	gltDrawTorus(0.35, 0.15, 61, 37);
+//	glMaterialfv(GL_FRONT, GL_SPECULAR, fNoLight);
+//	glPopMatrix();
+//}
+//
+//#pragma region DrawRobot
+//
+//void drawTorso()
+//{
+//	glEnable(GL_TEXTURE_2D);
+//	glBindTexture(GL_TEXTURE_2D, textureObjects[1]);
+//
+//	//back
+//	glBegin(GL_QUADS);
+//	glTexCoord2f(0.0f, 0.0f);
+//	glVertex3f(0, torsoHeight, -5.f);
+//	glTexCoord2f(0.0f, 1.0f);
+//	glVertex3f(0, 0, -5.f);
+//	glTexCoord2f(1.0f, 1.0f);
+//	glVertex3f(torsoWidth, 0, -5.f);
+//	glTexCoord2f(1.0f, 0.0f);
+//	glVertex3f(torsoWidth, torsoHeight, -5.f);
+//	glEnd();
+//
+//	//bottom
+//	glBegin(GL_QUADS);
+//	glTexCoord2f(0.0f, 0.0f);
+//	glVertex3f(0, 0, -5.f);
+//	glTexCoord2f(0.0f, 1.0f);
+//	glVertex3f(0, 0, 5.f);
+//	glTexCoord2f(1.0f, 1.0f);
+//	glVertex3f(torsoWidth, 0, 5.f);
+//	glTexCoord2f(1.0f, 0.0f);
+//	glVertex3f(torsoWidth, 0, -5.f);
+//	glEnd();
+//
+//	//left
+//	glBegin(GL_QUADS);
+//	glTexCoord2f(0.0f, 0.0f);
+//	glVertex3f(0, 0, -5.f);
+//	glTexCoord2f(0.0f, 1.0f);
+//	glVertex3f(0, 0, 5.f);
+//	glTexCoord2f(1.0f, 1.0f);
+//	glVertex3f(0, torsoHeight, 5.f);
+//	glTexCoord2f(1.0f, 0.0f);
+//	glVertex3f(0, torsoHeight, -5.f);
+//	glEnd();
+//
+//	//top
+//	glBegin(GL_QUADS);
+//	glTexCoord2f(0.0f, 0.0f);
+//	glVertex3f(0, torsoHeight, -5.f);
+//	glTexCoord2f(0.0f, 1.0f);
+//	glVertex3f(0, torsoHeight, 5.f);
+//	glTexCoord2f(1.0f, 1.0f);
+//	glVertex3f(torsoWidth, torsoHeight, 5.f);
+//	glTexCoord2f(1.0f, 0.0f);
+//	glVertex3f(torsoWidth, torsoHeight, -5.f);
+//	glEnd();
+//
+//	//right
+//	glBegin(GL_QUADS);
+//	glTexCoord2f(0.0f, 0.0f);
+//	glVertex3f(torsoWidth, torsoHeight, -5.f);
+//	glTexCoord2f(0.0f, 1.0f);
+//	glVertex3f(torsoWidth, torsoHeight, 5.f);
+//	glTexCoord2f(1.0f, 1.0f);
+//	glVertex3f(torsoWidth, 0, 5.f);
+//	glTexCoord2f(1.0f, 0.0f);
+//	glVertex3f(torsoWidth, 0, -5.f);
+//	glEnd();
+//
+//	//front
+//	glBegin(GL_QUADS);
+//	glTexCoord2f(0.0f, 0.0f);
+//	glVertex3f(0, torsoHeight, 5.f);
+//	glTexCoord2f(0.0f, 1.0f);
+//	glVertex3f(0, 0, 5.f);
+//	glTexCoord2f(1.0f, 1.0f);
+//	glVertex3f(torsoWidth, 0, 5.f);
+//	glTexCoord2f(1.0f, 0.0f);
+//	glVertex3f(torsoWidth, torsoHeight, 5.f);
+//	glEnd();
+//
+//}
+//
+//void drawHead()
+//{
+//	glColor3f(1, 0, 0);
+//	glutSolidSphere(1, 20, 20);
+//}
+//
+//void drawJoint()
+//{
+//	glColor3f(0, 1, 0);
+//	glutSolidSphere(0.3, 20, 20);
+//}
+//
+//void drawArm()
+//{
+//	glColor3ub(0, 170, 255);
+//
+//	//back
+//	glBegin(GL_QUADS);
+//	glVertex3f(0, armHeight, -2.0f);
+//	glVertex3f(0, 0, -2.0f);
+//	glVertex3f(armWidth, 0, -2.0f);
+//	glVertex3f(armWidth, armHeight, -2.0f);
+//	glEnd();
+//
+//	//bottom
+//	glBegin(GL_QUADS);
+//	glVertex3f(0, 0, -2.0f);
+//	glVertex3f(0, 0, 2.0f);
+//	glVertex3f(armWidth, 0, 2.0f);
+//	glVertex3f(armWidth, 0, -2.0f);
+//	glEnd();
+//
+//	//left
+//	glBegin(GL_QUADS);
+//	glVertex3f(0, 0, -2.0f);
+//	glVertex3f(0, 0, 2.0f);
+//	glVertex3f(0, armHeight, 2.0f);
+//	glVertex3f(0, armHeight, -2.0f);
+//	glEnd();
+//
+//	//top
+//	glBegin(GL_QUADS);
+//	glVertex3f(0, armHeight, -2.0f);
+//	glVertex3f(0, armHeight, 2.0f);
+//	glVertex3f(armWidth, armHeight, 2.0f);
+//	glVertex3f(armWidth, armHeight, -2.0f);
+//	glEnd();
+//
+//	//right
+//	glBegin(GL_QUADS);
+//	glVertex3f(armWidth, armHeight, -2.0f);
+//	glVertex3f(armWidth, armHeight, 2.0f);
+//	glVertex3f(armWidth, 0, 2.0f);
+//	glVertex3f(armWidth, 0, -2.0f);
+//	glEnd();
+//
+//	//front
+//	glBegin(GL_QUADS);
+//	glVertex3f(0, armHeight, 2.0f);
+//	glVertex3f(0, 0, 2.0f);
+//	glVertex3f(armWidth, 0, 2.0f);
+//	glVertex3f(armWidth, armHeight, 2.0f);
+//	glEnd();
+//}
+//
+//void drawLeg()
+//{
+//	glColor3ub(140, 126, 115);
+//
+//	//back
+//	glBegin(GL_QUADS);
+//	glVertex3f(0, legHeight, -2.0f);
+//	glVertex3f(0, 0, -2.0f);
+//	glVertex3f(legWidth, 0, -2.0f);
+//	glVertex3f(legWidth, legHeight, -2.0f);
+//	glEnd();
+//
+//	//bottom
+//	glBegin(GL_QUADS);
+//	glVertex3f(0, 0, -2.0f);
+//	glVertex3f(0, 0, 2.0f);
+//	glVertex3f(legWidth, 0, 2.0f);
+//	glVertex3f(legWidth, 0, -2.0f);
+//	glEnd();
+//
+//	//left
+//	glBegin(GL_QUADS);
+//	glVertex3f(0, 0, -2.0f);
+//	glVertex3f(0, 0, 2.0f);
+//	glVertex3f(0, legHeight, 2.0f);
+//	glVertex3f(0, legHeight, -2.0f);
+//	glEnd();
+//
+//	//top
+//	glBegin(GL_QUADS);
+//	glVertex3f(0, legHeight, -2.0f);
+//	glVertex3f(0, legHeight, 2.0f);
+//	glVertex3f(legWidth, legHeight, 2.0f);
+//	glVertex3f(legWidth, legHeight, -2.0f);
+//	glEnd();
+//
+//	//right
+//	glBegin(GL_QUADS);
+//	glVertex3f(legWidth, legHeight, -2.0f);
+//	glVertex3f(legWidth, legHeight, 2.0f);
+//	glVertex3f(legWidth, 0, 2.0f);
+//	glVertex3f(legWidth, 0, -2.0f);
+//	glEnd();
+//
+//	//front
+//	glBegin(GL_QUADS);
+//	glVertex3f(0, legHeight, 2.0f);
+//	glVertex3f(0, 0, 2.0f);
+//	glVertex3f(legWidth, 0, 2.0f);
+//	glVertex3f(legWidth, legHeight, 2.0f);
+//	glEnd();
+//}
+//
+//void drawRobot()
+//{
+//	//Draw Start
+//	{
+//		glPushMatrix();
+//		glTranslatef(torsoMoveX, torsoMoveY, 0);
+//
+//		//Head
+//		{
+//			glPushMatrix();
+//			glTranslatef(torsoWidth / 2, torsoHeight + headRadius, 0);
+//			drawHead();
+//			glPopMatrix();
+//		}
+//
+//		// Left Upper Arm Hand
+//		{
+//			glPushMatrix();
+//
+//			glTranslatef(torsoWidth + jointRadius, torsoHeight - jointRadius, 0);
+//			glRotatef(luaRotateX, 1, 0, 0);
+//			glRotatef(luaRotateY, 0, 1, 0);
+//			glRotatef(luaRotateZ, 0, 0, 1);
+//
+//			drawJoint();
+//
+//			{
+//				glPushMatrix();
+//				glTranslatef(-armWidth / 2, -jointRadius - armHeight, 0);
+//				drawArm();
+//
+//				// Left Front Arm
+//				{
+//					glPushMatrix();
+//
+//					glTranslatef(+jointRadius, -jointRadius, 0);
+//					glRotatef(lfaRotateX, 1, 0, 0);
+//					glRotatef(lfaRotateY, 0, 1, 0);
+//					glRotatef(lfaRotateZ, 0, 0, 1);
+//
+//					drawJoint();
+//
+//					{
+//						glPushMatrix();
+//						glTranslatef(-armWidth / 2, -jointRadius - armHeight, 0);
+//						drawArm();
+//						glPopMatrix();
+//					}
+//
+//					glPopMatrix();
+//				}
+//
+//				glPopMatrix();
+//			}
+//
+//			glPopMatrix();
+//		}
+//
+//		// Right Upper Arm Hand
+//		{
+//			glPushMatrix();
+//
+//			glTranslatef(-jointRadius, torsoHeight - jointRadius, 0);
+//			glRotatef(ruaRotateX, 1, 0, 0);
+//			glRotatef(ruaRotateY, 0, 1, 0);
+//			glRotatef(ruaRotateZ, 0, 0, 1);
+//
+//			drawJoint();
+//
+//			{
+//				glPushMatrix();
+//				glTranslatef(-armWidth / 2, -jointRadius - armHeight, 0);
+//
+//				drawArm();
+//
+//				// Right Front Arm
+//				{
+//					glPushMatrix();
+//
+//					glTranslatef(+jointRadius, -jointRadius, 0);
+//					glRotatef(rfaRotateX, 1, 0, 0);
+//					glRotatef(rfaRotateY, 0, 1, 0);
+//					glRotatef(rfaRotateZ, 0, 0, 1);
+//					drawJoint();
+//
+//					{
+//						glPushMatrix();
+//						glTranslatef(-armWidth / 2, -jointRadius - armHeight, 0);
+//						drawArm();
+//						glPopMatrix();
+//					}
+//
+//					glPopMatrix();
+//				}
+//
+//				glPopMatrix();
+//			}
+//
+//			glPopMatrix();
+//		}
+//
+//		// Left Upper Leg
+//		{
+//			glPushMatrix();
+//			glTranslatef((torsoWidth + torsoWidth / 2) / 2, -jointRadius, 0);
+//			glRotatef(lulRotateX, 1, 0, 0);
+//			glRotatef(lulRotateY, 0, 1, 0);
+//			glRotatef(lulRotateZ, 0, 0, 1);
+//
+//			drawJoint();
+//
+//			{
+//				glPushMatrix();
+//				glTranslatef(-legWidth / 2, -jointRadius - legHeight, 0);
+//
+//				drawLeg();
+//
+//				// down Leg
+//				{
+//					glPushMatrix();
+//					glTranslatef(legWidth / 2, -jointRadius, 0);
+//					glRotatef(ldlRotateX, 1, 0, 0);
+//					glRotatef(ldlRotateY, 0, 1, 0);
+//					glRotatef(ldlRotateZ, 0, 0, 1);
+//
+//					drawJoint();
+//
+//					{
+//						glPushMatrix();
+//						glTranslatef(-legWidth / 2, -jointRadius - legHeight, 0);
+//						drawLeg();
+//
+//						glPopMatrix();
+//					}
+//
+//					glPopMatrix();
+//				}
+//
+//				glPopMatrix();
+//			}
+//
+//			glPopMatrix();
+//		}
+//
+//		// Right Upper Leg
+//		{
+//			glPushMatrix();
+//			glTranslatef((torsoWidth - torsoWidth / 2) / 2, -jointRadius, 0);
+//			glRotatef(rulRotateX, 1, 0, 0);
+//			glRotatef(rulRotateY, 0, 1, 0);
+//			glRotatef(rulRotateZ, 0, 0, 1);
+//
+//			drawJoint();
+//
+//			{
+//				glPushMatrix();
+//				glTranslatef(-legWidth / 2, -jointRadius - legHeight, 0);
+//
+//				drawLeg();
+//
+//				// down Leg
+//				{
+//					glPushMatrix();
+//					glTranslatef(legWidth / 2, -jointRadius, 0);
+//					glRotatef(rdlRotateX, 1, 0, 0);
+//					glRotatef(rdlRotateY, 0, 1, 0);
+//					glRotatef(rdlRotateZ, 0, 0, 1);
+//
+//					drawJoint();
+//
+//					{
+//						glPushMatrix();
+//						glTranslatef(-legWidth / 2, -jointRadius - legHeight, 0);
+//						drawLeg();
+//
+//						glPopMatrix();
+//					}
+//
+//					glPopMatrix();
+//				}
+//
+//				glPopMatrix();
+//			}
+//
+//			glPopMatrix();
+//		}
+//
+//		drawTorso();
+//		glPopMatrix();
+//	}
+//
+//}
+//
+//#pragma endregion
+//
+//
 //// Called to draw scene
 //void RenderScene(void)
-//    {
-//    // Clear the window with current clearing color
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-//        
-//    glPushMatrix();
-//        //frameCamera.ApplyCameraTransform();
-//        
-//        // Position light before any other transformations
-//        glLightfv(GL_LIGHT0, GL_POSITION, fLightPos);
-//        
-//        // Draw the ground
-//        glColor3f(1.0f, 1.0f, 1.0f);
-//        DrawGround();
-//        
-//        // Draw shadows first
-//        glDisable(GL_DEPTH_TEST);
-//        glDisable(GL_LIGHTING);
-//        glDisable(GL_TEXTURE_2D);
-//        glEnable(GL_BLEND);
-//        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//        glEnable(GL_STENCIL_TEST);
-//        glPushMatrix();
-//            glMultMatrixf(mShadowMatrix);
-//            DrawInhabitants(1);
-//        glPopMatrix();
-//        glDisable(GL_STENCIL_TEST);
-//        glDisable(GL_BLEND);
-//        glEnable(GL_LIGHTING);
-//        glEnable(GL_TEXTURE_2D);
-//        glEnable(GL_DEPTH_TEST);
-//        
-//        // Draw inhabitants normally
-//        DrawInhabitants(0);
+//{
+//	// Clear the window with current clearing color
+//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 //
-//    glPopMatrix();    
+//	glPushMatrix();
+//	//frameCamera.ApplyCameraTransform();
+//
+//	// Position light before any other transformations
+//	glLightfv(GL_LIGHT0, GL_POSITION, fLightPos);
+//
+//	// Draw the ground
+//	//glColor3f(1.0f, 1.0f, 1.0f);
+//	DrawGround();
+//
+//	// Draw shadows first
+//	glDisable(GL_DEPTH_TEST);
+//	glDisable(GL_LIGHTING);
+//	glDisable(GL_TEXTURE_2D);
+//	glEnable(GL_BLEND);
+//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//	glEnable(GL_STENCIL_TEST);
+//	glPushMatrix();
+//	glMultMatrixf(mShadowMatrix);
+//	DrawInhabitants(1);
+//	glPopMatrix();
+//	glDisable(GL_STENCIL_TEST);
+//	glDisable(GL_BLEND);
+//	glEnable(GL_LIGHTING);
+//	glEnable(GL_TEXTURE_2D);
+//	glEnable(GL_DEPTH_TEST);
+//
+//	// Draw inhabitants normally
+//	DrawInhabitants(0);
+//
+//	
+//
+//	glPopMatrix();
+//
+//	glColor3f(1, 0, 0);
+//	glBegin(GL_QUADS);
+//	glVertex3f(5, 5, 1.0f);
+//	glVertex3f(5, 5, 5.0f);
+//	glVertex3f(5, 5, -1.0f);
+//	glVertex3f(5, 5, -5.0f);
+//	glEnd();
+//
+//	//drawRobot();
 //
 //
-//    // Do the buffer Swap
-//    glutSwapBuffers();
-//    }
+//	
+//
+//	// Do the buffer Swap
+//	glutSwapBuffers();
+//}
 //
 //
 //
 //// Respond to arrow keys by moving the camera frame of reference
 //void SpecialKeys(int key, int x, int y)
-//    {
-//    /*if (key == GLUT_KEY_UP)
-//        frameCamera.MoveForward(0.1f);
+//{
+//	/*if (key == GLUT_KEY_UP)
+//		frameCamera.MoveForward(0.1f);
 //
-//    if(key == GLUT_KEY_DOWN)
+//	if(key == GLUT_KEY_DOWN)
 //		frameCamera.MoveForward(-0.1f);
 //
-//    if(key == GLUT_KEY_LEFT)
+//	if(key == GLUT_KEY_LEFT)
 //		frameCamera.RotateLocalY(0.1f);
-//	   
-//    if(key == GLUT_KEY_RIGHT)
-//        frameCamera.RotateLocalY(-0.1f);*/
-//                        
-//    // Refresh the Window
-//    glutPostRedisplay();
-//    }
+//
+//	if(key == GLUT_KEY_RIGHT)
+//		frameCamera.RotateLocalY(-0.1f);*/
+//
+//	float shift = 4.0f;
+//	switch (key)
+//	{
+//	case GLUT_KEY_LEFT:
+//		torsoMoveX -= shift;
+//		break;
+//	case GLUT_KEY_RIGHT:
+//		torsoMoveX += shift;
+//		break;
+//	case GLUT_KEY_UP:
+//		torsoMoveY += shift;
+//		break;
+//	case GLUT_KEY_DOWN:
+//		torsoMoveY -= shift;
+//		break;
+//	default:
+//		break;
+//	}
+//		// Refresh the Window
+//	glutPostRedisplay();
+//}
 //
 /////////////////////////////////////////////////////////////
 //// Called by GLUT library when idle (window not being
 //// resized or moved)
 //void TimerFunction(int value)
-//    {
-//    // Redraw the scene with new coordinates
-//    glutPostRedisplay();
-//    glutTimerFunc(3,TimerFunction, 1);
-//    }
+//{
+//	// Redraw the scene with new coordinates
+//	glutPostRedisplay();
+//	glutTimerFunc(20, TimerFunction, 1);
+//}
 //
 //void ChangeSize(int w, int h)
-//    {
-//    GLfloat fAspect;
+//{
+//	GLfloat fAspect;
 //
-//    // Prevent a divide by zero, when window is too short
-//    // (you cant make a window of zero width).
-//    if(h == 0)
-//        h = 1;
+//	// Prevent a divide by zero, when window is too short
+//	// (you cant make a window of zero width).
+//	if (h == 0)
+//		h = 1;
 //
-//    glViewport(0, 0, w, h);
-//        
-//    fAspect = (GLfloat)w / (GLfloat)h;
+//	glViewport(0, 0, w, h);
 //
-//    // Reset the coordinate system before modifying
-//    glMatrixMode(GL_PROJECTION);
-//    glLoadIdentity();
-//	
-//    // Set the clipping volume
-//    gluPerspective(35.0f, fAspect, 1.0f, 50.0f);
-//        
-//    glMatrixMode(GL_MODELVIEW);
-//    glLoadIdentity();    
-//    }
+//	fAspect = (GLfloat)w / (GLfloat)h;
+//
+//	// Reset the coordinate system before modifying
+//	glMatrixMode(GL_PROJECTION);
+//	glLoadIdentity();
+//
+//	// Set the clipping volume
+//	gluPerspective(35.0f, fAspect, 1.0f, 50.0f);
+//
+//	glMatrixMode(GL_MODELVIEW);
+//	glLoadIdentity();
+//}
 //
 //int main(int argc, char* argv[])
 //    {
 //    glutInit(&argc, argv);
 //    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL);
 //    glutInitWindowSize(800,600);
-//    glutCreateWindow("OpenGL SphereWorld Demo + Texture Maps");
+//    glutCreateWindow("Lab10_Animation");
+//	initPosition();
 //    glutReshapeFunc(ChangeSize);
 //    glutDisplayFunc(RenderScene);
 //    glutSpecialFunc(SpecialKeys);

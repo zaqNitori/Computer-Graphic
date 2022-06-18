@@ -14,7 +14,9 @@ using namespace cv;
 
 // Keep track of effects step
 int nStep = 0;
-
+int timer_flag = 1;
+int dir = 1;
+float rs1, rs2, rs3, rs4;
 
 // Lighting data
 GLfloat lightAmbient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
@@ -60,6 +62,8 @@ void initPosition()
 
 	legHeight = 25;
 	legWidth = 10;
+	rs1 = rs2 = 3;
+	rs3 = rs4 = 2;
 
 	torsoMoveX = torsoMoveY = 0;
 	luaRotateY = lfaRotateY = ruaRotateY = rfaRotateY = lulRotateY = ldlRotateY = rulRotateY = rdlRotateY = 0;
@@ -460,20 +464,85 @@ void DrawLab05()
 	glPopMatrix();
 }
 
-// Called to draw scene
-void RenderScene(void)
+void do_Animation()
 {
+	float shift = 2;
+	int xr = 50, yr = 30;
+	int pre = dir;
 
+	if (torsoMoveX >= xr && dir == 1)
+		dir = 2;
+	else if (torsoMoveY >= yr && dir == 2)
+		dir = 3;
+	else if (torsoMoveX <= -xr && dir == 3)
+		dir = 4;
+	else if (torsoMoveY <= -yr && dir == 4)
+		dir = 1;
 
-	// Clear the window with current clearing color
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glShadeModel(GL_SMOOTH);
-	glEnable(GL_NORMALIZE);
+	if (pre != dir)
+	{
+		rs1 = rand() % 6 + 1;
+		rs2 = rand() % 6 + 1;
+		rs3 = rand() % 4 + 1;
+		rs4 = rand() % 4 + 1;
+	}
 
+	if (dir & 1)
+	{
+		if (torsoMoveX < xr && dir == 1)
+			torsoMoveX += shift;
+		else if (torsoMoveX > -xr && dir == 3)
+			torsoMoveX -= shift;
+	}
+	else
+	{
+		if (torsoMoveY < yr && dir == 2)
+			torsoMoveY += shift;
+		else if (torsoMoveY > -yr && dir == 4)
+			torsoMoveY -= shift;
+	}
+
+	switch (dir)
+	{
+	case 1:
+		luaRotateZ += rs1;
+		lulRotateZ += rs2;
+		lfaRotateZ += rs3;
+		ldlRotateZ += rs4;
+		break;
+	case 2:
+		ruaRotateZ += rs1;
+		rulRotateZ += rs2;
+		rfaRotateZ += rs3;
+		rdlRotateZ += rs4;
+		break;
+	case 3:
+		luaRotateZ -= rs1;
+		lulRotateZ -= rs2;
+		lfaRotateZ -= rs3;
+		ldlRotateZ -= rs4;
+		break;
+	case 4:
+		ruaRotateZ -= rs1;
+		rulRotateZ -= rs2;
+		rfaRotateZ -= rs3;
+		rdlRotateZ -= rs4;
+		break;
+	}
+
+}
+
+void drawRobot()
+{
 	//Draw Start
 	{
+		if (timer_flag)
+			do_Animation();
+
 		glPushMatrix();
-		glTranslatef(torsoMoveX, torsoMoveY, 0);
+		glTranslatef(torsoMoveX, torsoMoveY, 0); 
+
+		drawTorso();
 
 		//Head
 		{
@@ -655,9 +724,23 @@ void RenderScene(void)
 			glPopMatrix();
 		}
 
-		drawTorso();
+		//drawTorso();
 		glPopMatrix();
 	}
+
+}
+
+// Called to draw scene
+void RenderScene(void)
+{
+
+
+	// Clear the window with current clearing color
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glShadeModel(GL_SMOOTH);
+	glEnable(GL_NORMALIZE);
+
+	drawRobot();
 
 	// Flush drawing commands
 	glutSwapBuffers();
@@ -711,6 +794,15 @@ void SetupRC()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.cols, image.rows, 0,
 		GL_BGR_EXT, GL_UNSIGNED_BYTE, image.ptr());
+}
+
+void TimerFunction(int value)
+{
+	if (timer_flag == 0) return;
+
+	// Redraw the scene with new coordinates
+	glutPostRedisplay();
+	glutTimerFunc(33, TimerFunction, 1);
 }
 
 void KeyPressFunc(unsigned char key, int x, int y)
@@ -790,6 +882,17 @@ void KeyPressFunc(unsigned char key, int x, int y)
 	case 'm':
 		rdlRotateZ += shift;
 		break;
+	case 'p':
+		if (timer_flag)
+		{
+			timer_flag = 0;
+		}
+		else
+		{
+			timer_flag = 1;
+			glutTimerFunc(33, TimerFunction, 1);
+		}
+		break;
 	case 'r':
 		torsoMoveX = torsoMoveY = 0;
 		luaRotateY = lfaRotateY = ruaRotateY = rfaRotateY = lulRotateY = ldlRotateY = rulRotateY = rdlRotateY = 0;
@@ -867,13 +970,14 @@ void ChangeSize(int w, int h)
 	//glRotatef(30.0f, 1.0f, 0.0f, 0.0f);
 	//glRotatef(330.0f, 0.0f, 1.0f, 0.0f);
 }
-
+ 
 int main(int argc, char* argv[])
 {
+	srand(time(NULL));
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowSize(800, 600);
-	glutCreateWindow("Lab07_Texture");
+	glutCreateWindow("Draw_Robot");
 	initPosition();
 	glutReshapeFunc(ChangeSize);
 	glutKeyboardFunc(KeyPressFunc);
@@ -881,6 +985,7 @@ int main(int argc, char* argv[])
 	glutSpecialFunc(mySpecialKey);
 
 	SetupRC();
+	glutTimerFunc(33, TimerFunction, 0);
 
 	glutMainLoop();
 	glDeleteTextures(4, textures);
