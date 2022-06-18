@@ -14,7 +14,7 @@ using namespace cv;
 
 // Keep track of effects step
 int nStep = 0;
-int timer_flag = 1;
+int timer_flag = 0;
 int dir = 1;
 float rs1, rs2, rs3, rs4;
 
@@ -985,7 +985,7 @@ int main(int argc, char* argv[])
 	glutSpecialFunc(mySpecialKey);
 
 	SetupRC();
-	glutTimerFunc(33, TimerFunction, 0);
+	glutTimerFunc(33, TimerFunction, timer_flag);
 
 	glutMainLoop();
 	glDeleteTextures(4, textures);
