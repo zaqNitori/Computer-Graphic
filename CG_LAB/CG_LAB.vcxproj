@@ -155,6 +155,7 @@
     <ClCompile Include="math3d.cpp" />
     <ClCompile Include="Midterm_Rasterization_Polygon.cpp" />
     <ClCompile Include="DrawRobot.cpp" />
+    <ClCompile Include="ObjParser.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
