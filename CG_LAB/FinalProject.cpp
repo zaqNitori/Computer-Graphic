@@ -23,11 +23,23 @@ using namespace std;
 typedef pair<int, int> pii;
 typedef pair<float, float> pff;
 
-typedef struct
+typedef struct vertex
 {
     float r, g, b;
     float x, y, z;
+    vertex() :x{ 0 }, y{ 0 }, z{ 0 }, r{ 0 }, g{ 0 }, b{ 0 } {}
+    vertex(float fx, float fy, float fz, float fr, float fg, float fb) :
+        x{ fx }, y{ fy }, z{ fz }, r{ fr }, g{ fg }, b{ fb }{}
+
 }Vertex;
+
+typedef struct face
+{
+    int p1, p2, p3;
+    face(int p1, int p2, int p3) :
+        p1{ p1 }, p2{ p2 }, p3{ p3 }{}
+
+}Face;
 
 #pragma region Enum
 
@@ -58,11 +70,17 @@ enum BoundingMode {
 #pragma endregion
 
 vector<Vertex> vertexVector;
+vector<Face> faceVector;
 FileMode flMode;
 RenderMode rdMode;
 ColorMode crMode;
 BoundingMode bdMode;
+
+GLfloat rotateX, rotateY;
+GLfloat translateX, translateY;
 GLfloat window_width, window_height;
+
+
 string filePath[] = {
     "None",
     "./material/final/gourd.obj",
@@ -71,7 +89,7 @@ string filePath[] = {
     "./material/final/octahedron.obj"
 };
 
-bool ObjParser();
+void ObjParser();
 void ChangeSize(int, int);
 void RenderScene();
 void mySpecialKey(int, int, int);
@@ -79,11 +97,12 @@ void myKeyboard(unsigned char, int, int);
 void myMouse(int, int, int, int);
 void InitialMenu();
 
-bool ObjParser()
+void ObjParser()
 {
     ifstream ifs;
     string line;
     float f[3];
+    int p[3];
     int idx;
     
     if (flMode == FileMode::Input)
@@ -98,24 +117,39 @@ bool ObjParser()
     if (!ifs.good())
     {
         printf("Failed to open file!\n");
-        return false;
+        ifs.close();
+        return;
     }
 
-    int t = 0;
+    vertexVector.clear();
+    faceVector.clear();
+
     while (ifs >> line)
     {
-    	if (line == "f" || line == "v")
+    	if (line == "f")
     	{
-            t++;
     		idx = 0;
-    		while (ifs >> f[idx++] && idx < 3);
-            printf("%f, %f, %f\n", f[0],f[1],f[2]);
+    		while (ifs >> p[idx++] && idx < 3);
+
+            Face f(p[0] - 1, p[1] - 1, p[2] - 1);
+            faceVector.push_back(f);
     	}
-        if (t > 10) break;
+        else if (line == "v")
+        {
+            idx = 0;
+            while (ifs >> f[idx++] && idx < 3);
+
+            double r, g, b;
+            r = ((double)rand() / (RAND_MAX));
+            g = ((double)rand() / (RAND_MAX));
+            b = ((double)rand() / (RAND_MAX));
+            Vertex v(f[0], f[1], f[2], r, g, b);
+            vertexVector.push_back(v);
+        }
     }
     ifs.close();
 
-    return true;
+    return;
 }
 
 void InitialParameter()
@@ -123,10 +157,14 @@ void InitialParameter()
     window_height = 600;
     window_width = 800;
     vertexVector.clear();
+    faceVector.clear();
     flMode = FileMode::octahedron;
     rdMode = RenderMode::Line;
     crMode = ColorMode::Single;
     bdMode = BoundingMode::On;
+
+    translateX = translateY = 0;
+    rotateX = rotateY = 0;
 }
 
 void InitialGlut(int argc, char** argv)
@@ -140,39 +178,12 @@ void InitialGlut(int argc, char** argv)
     glutCreateWindow("Final_Project");
 }
 
-void LightSetting()
-{
-    GLfloat light_ambient[] = { 0.2, 0.2, 0.2, 1.0 };
-    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat light_specular[] = { 0.0, 0.0, 0.0, 1.0 };
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-}
-
-void MaterialSetting()
-{
-    GLfloat mat_specular[] = { 0.0, 0.0, 0.0, 1.0 };
-    GLfloat mat_diffuse[] = { 0.8, 0.6, 0.4, 1.0 };
-    GLfloat mat_ambient[] = { 0.8, 0.6, 0.4, 1.0 };
-    GLfloat mat_shininess = { 20.0 };
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-    glMaterialf(GL_FRONT, GL_SHININESS, mat_shininess);
-    //glShadeModel(GL_SMOOTH); /*enable smooth shading */
-    glEnable(GL_LIGHTING); /* enable lighting */
-    glEnable(GL_LIGHT0); /* enable light 0 */
-}
-
 int main(int argc, char** argv)
 {
     srand(time(NULL));
     InitialParameter();
     InitialGlut(argc, argv);
     InitialMenu();
-    LightSetting();
-    MaterialSetting();
 
     glutKeyboardFunc(myKeyboard);
     glutMouseFunc(myMouse);
@@ -188,7 +199,7 @@ int main(int argc, char** argv)
 
 void ChangeSize(int w, int h)
 {
-    int ortho = 10;
+    int ortho = 5;
     printf("Window Size= %d X %d\n", w, h);
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
@@ -202,15 +213,81 @@ void ChangeSize(int w, int h)
 
 #pragma region Draw Method
 
+void DrawObj()
+{
+    glPushMatrix();
+
+    glTranslatef(translateX, translateY, 0);
+    glRotatef(rotateX, 1, 0, 0);
+    glRotatef(rotateY, 0, 1, 0);
+
+    Vertex nv;
+    for (auto au : faceVector)
+    {
+        glBegin(GL_TRIANGLES);
+        nv = vertexVector[au.p1];
+        glColor3f(nv.r, nv.g, nv.b);
+        glVertex3f(nv.x, nv.y, nv.z);
+
+        nv = vertexVector[au.p2];
+        glPointSize(4.0f);
+        glColor3f(nv.r, nv.g, nv.b);
+        glVertex3f(nv.x, nv.y, nv.z);
+
+        nv = vertexVector[au.p3];
+        glPointSize(4.0f);
+        glColor3f(nv.r, nv.g, nv.b);
+        glVertex3f(nv.x, nv.y, nv.z);
+        glEnd();
+    }
+
+    glPopMatrix();
+}
+
+void SetDrawAttribute()
+{
+    switch (rdMode)
+    {
+    case Point:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+        break;
+    case Line:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        break;
+    case Fill:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        break;
+    default:
+        break;
+    }
+
+    switch (crMode)
+    {
+    case Single:
+        glShadeModel(GL_FLAT);
+        break;
+    case Random:
+        glShadeModel(GL_SMOOTH);
+        break;
+    default:
+        break;
+    }
+}
+
 void RenderScene()
 {
     glClearColor(0, 0, 0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0, 0, 3.0f
+    gluLookAt(0, 0, 5
         , 0, 0, 0
         , 0, 1, 0);
+
+    
+    SetDrawAttribute();
+    DrawObj();
+
 
     glutSwapBuffers();
 }
@@ -224,6 +301,10 @@ void myKeyboard(unsigned char key, int x, int y)
 {
     switch (key)
     {
+    case 'r':
+        translateX = translateY = 0;
+        rotateX = rotateY = 0;
+        break;
     default:
         break;
     }
@@ -249,12 +330,16 @@ void mySpecialKey(int key, int x, int y)
     switch (key)
     {
     case GLUT_KEY_LEFT:
+        rotateY -= shift;
         break;
     case GLUT_KEY_RIGHT:
+        rotateY += shift;
         break;
     case GLUT_KEY_UP:
+        rotateX -= shift;
         break;
     case GLUT_KEY_DOWN:
+        rotateX += shift;
         break;
     default:
         break;
@@ -323,14 +408,11 @@ void colorMenu(int index)
 {
     switch (index)
     {
-    case RenderMode::Point:
-        rdMode = RenderMode::Point;
+    case ColorMode::Single:
+        crMode = ColorMode::Single;
         break;
-    case RenderMode::Line:
-        rdMode = RenderMode::Line;
-        break;
-    case RenderMode::Fill:
-        rdMode = RenderMode::Fill;
+    case ColorMode::Random:
+        crMode = ColorMode::Random;
         break;
     default:
         break;
