@@ -24,7 +24,8 @@ enum FileMode {
     ground = 1,
     teapot = 2,
     teddy = 3,
-    octahedron = 4
+    octahedron = 4,
+    Input = 5
 };
 
 enum RenderMode {
@@ -225,6 +226,9 @@ void fileMenu(int index)
     case FileMode::octahedron:
         flMode = FileMode::octahedron;
         break;
+    case FileMode::Input:
+        flMode = FileMode::Input;
+        break;
     default:
         break;
     }
@@ -297,6 +301,7 @@ void InitialMenu()
     glutAddMenuEntry("teapot", FileMode::teapot);
     glutAddMenuEntry("teddy", FileMode::teddy);
     glutAddMenuEntry("octahedron", FileMode::octahedron);
+    glutAddMenuEntry("input", FileMode::Input);
 #pragma endregion
 
 #pragma region RenderMenu
