@@ -578,7 +578,7 @@ void InitialMenu()
 
     glutCreateMenu(myMenu);
     glutAddSubMenu("File Mode", fmenu);
-    glutAddSubMenu("Polygon Mode", rmenu);
+    glutAddSubMenu("Render Mode", rmenu);
     glutAddSubMenu("Color Mode", cmenu);
     glutAddSubMenu("Bounding Mode", bmenu);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
