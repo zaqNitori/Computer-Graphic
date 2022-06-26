@@ -120,7 +120,7 @@ void ObjParser()
     {
         char buf[100];
         cin.getline(buf, 100);
-        ifs.open(buf, ifstream::in);
+        ifs.open("./material/final/" + string(buf), ifstream::in);
     }
     else
         ifs.open(filePath[flMode], ifstream::in);
@@ -327,11 +327,13 @@ void DrawBoundingBox()
 
 void SetOrtho()
 {
-    float scale = 2;
+    float scale;
+    scale = (flMode == FileMode::Input) ? 1 : 2;
     GLfloat small, big;
 
     small = (minX > minY) ? (minY > minZ) ? minZ : minY : (minX > minZ) ? minZ : minX;
     big = (maxX > maxY) ? (maxX > maxZ) ? maxX : maxZ : (maxY > maxZ) ? maxY : maxZ;
+    printf("%f, %f\n", minZ, maxZ);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -359,8 +361,12 @@ void RenderScene()
         glTranslatef(translateX, translateY, 0);
         glRotatef(rotateX, 1, 0, 0);
         glRotatef(rotateY, 0, 1, 0);
+        glRotatef(0, 0, 0, 1);
 
+        glPushMatrix();
         DrawObj();
+        glPopMatrix();
+
         DrawBoundingBox();
     }
     glPopMatrix();
@@ -375,11 +381,24 @@ void RenderScene()
 
 void myKeyboard(unsigned char key, int x, int y)
 {
+    float shift = 4.0f;
     switch (key)
     {
     case 'r':
         translateX = translateY = 0;
         rotateX = rotateY = 0;
+        break;
+    case 'a':
+        rotateY -= shift;
+        break;
+    case 'd':
+        rotateY += shift;
+        break;
+    case 'w':
+        rotateX -= shift;
+        break;
+    case 's':
+        rotateX += shift;
         break;
     default:
         break;
@@ -406,16 +425,16 @@ void mySpecialKey(int key, int x, int y)
     switch (key)
     {
     case GLUT_KEY_LEFT:
-        rotateY -= shift;
+        translateX -= shift;
         break;
     case GLUT_KEY_RIGHT:
-        rotateY += shift;
+        translateX += shift;
         break;
     case GLUT_KEY_UP:
-        rotateX -= shift;
+        translateY += shift;
         break;
     case GLUT_KEY_DOWN:
-        rotateX += shift;
+        translateY -= shift;
         break;
     default:
         break;
