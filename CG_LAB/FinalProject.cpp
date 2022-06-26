@@ -79,7 +79,7 @@ BoundingMode bdMode;
 GLfloat rotateX, rotateY;
 GLfloat translateX, translateY;
 GLfloat window_width, window_height;
-
+GLfloat maxX, minX, maxY, minY, maxZ, minZ;
 
 string filePath[] = {
     "None",
@@ -96,6 +96,17 @@ void mySpecialKey(int, int, int);
 void myKeyboard(unsigned char, int, int);
 void myMouse(int, int, int, int);
 void InitialMenu();
+
+void FindBoundingBox(float fp[3])
+{
+    maxX = max(maxX, fp[0]);
+    maxY = max(maxY, fp[1]);
+    maxZ = max(maxZ, fp[2]);
+
+    minX = min(minX, fp[0]);
+    minY = min(minY, fp[1]);
+    minZ = min(minZ, fp[2]);
+}
 
 void ObjParser()
 {
@@ -121,6 +132,8 @@ void ObjParser()
         return;
     }
 
+    maxX = maxY = maxZ = INT_MIN;
+    minX = minY = minZ = INT_MAX;
     vertexVector.clear();
     faceVector.clear();
 
@@ -138,6 +151,8 @@ void ObjParser()
         {
             idx = 0;
             while (ifs >> f[idx++] && idx < 3);
+
+            FindBoundingBox(f);
 
             double r, g, b;
             r = ((double)rand() / (RAND_MAX));
@@ -161,10 +176,13 @@ void InitialParameter()
     flMode = FileMode::octahedron;
     rdMode = RenderMode::Line;
     crMode = ColorMode::Single;
-    bdMode = BoundingMode::On;
+    bdMode = BoundingMode::Off;
 
     translateX = translateY = 0;
     rotateX = rotateY = 0;
+
+    maxX = maxY = maxZ = INT_MIN;
+    minX = minY = minZ = INT_MAX;
 }
 
 void InitialGlut(int argc, char** argv)
@@ -215,11 +233,6 @@ void ChangeSize(int w, int h)
 
 void DrawObj()
 {
-    glPushMatrix();
-
-    glTranslatef(translateX, translateY, 0);
-    glRotatef(rotateX, 1, 0, 0);
-    glRotatef(rotateY, 0, 1, 0);
 
     Vertex nv;
     for (auto au : faceVector)
@@ -240,8 +253,6 @@ void DrawObj()
         glVertex3f(nv.x, nv.y, nv.z);
         glEnd();
     }
-
-    glPopMatrix();
 }
 
 void SetDrawAttribute()
@@ -249,6 +260,7 @@ void SetDrawAttribute()
     switch (rdMode)
     {
     case Point:
+        glPointSize(4.0f);
         glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         break;
     case Line:
@@ -274,20 +286,84 @@ void SetDrawAttribute()
     }
 }
 
+void DrawBoundingBox()
+{
+    if (bdMode == BoundingMode::Off) return;
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glColor3f(1, 1, 1);
+    // left
+    glBegin(GL_QUADS);
+    glVertex3f(minX, minY, minZ);
+    glVertex3f(minX, minY, maxZ);
+    glVertex3f(minX, maxY, maxZ);
+    glVertex3f(minX, maxY, minZ);
+    glEnd();
+
+    // right
+    glBegin(GL_QUADS);
+    glVertex3f(maxX, minY, minZ);
+    glVertex3f(maxX, minY, maxZ);
+    glVertex3f(maxX, maxY, maxZ);
+    glVertex3f(maxX, maxY, minZ);
+    glEnd();
+
+    // front
+    glBegin(GL_QUADS);
+    glVertex3f(minX, minY, maxZ);
+    glVertex3f(maxX, minY, maxZ);
+    glVertex3f(maxX, maxY, maxZ);
+    glVertex3f(minX, maxY, maxZ);
+    glEnd();
+
+    // back
+    glBegin(GL_QUADS);
+    glVertex3f(minX, minY, minZ);
+    glVertex3f(maxX, minY, minZ);
+    glVertex3f(maxX, maxY, minZ);
+    glVertex3f(minX, maxY, minZ);
+    glEnd();
+}
+
+void SetOrtho()
+{
+    float scale = 2;
+    GLfloat small, big;
+
+    small = (minX > minY) ? (minY > minZ) ? minZ : minY : (minX > minZ) ? minZ : minX;
+    big = (maxX > maxY) ? (maxX > maxZ) ? maxX : maxZ : (maxY > maxZ) ? maxY : maxZ;
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(small * scale, big * scale, small * scale, big * scale, small * scale, big * scale);
+}
+
 void RenderScene()
 {
     glClearColor(0, 0, 0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+
+    SetOrtho();
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0, 0, 5
+    gluLookAt(0, 0, .5
         , 0, 0, 0
         , 0, 1, 0);
 
     
     SetDrawAttribute();
-    DrawObj();
 
+    glPushMatrix();
+    {
+        glTranslatef(translateX, translateY, 0);
+        glRotatef(rotateX, 1, 0, 0);
+        glRotatef(rotateY, 0, 1, 0);
+
+        DrawObj();
+        DrawBoundingBox();
+    }
+    glPopMatrix();
 
     glutSwapBuffers();
 }
