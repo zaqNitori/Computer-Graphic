@@ -78,6 +78,7 @@ BoundingMode bdMode;
 
 GLfloat rotateX, rotateY;
 GLfloat translateX, translateY;
+GLfloat scaling;
 GLfloat window_width, window_height;
 GLfloat maxX, minX, maxY, minY, maxZ, minZ;
 
@@ -180,6 +181,7 @@ void InitialParameter()
 
     translateX = translateY = 0;
     rotateX = rotateY = 0;
+    scaling = 1;
 
     maxX = maxY = maxZ = INT_MIN;
     minX = minY = minZ = INT_MAX;
@@ -327,13 +329,12 @@ void DrawBoundingBox()
 
 void SetOrtho()
 {
-    float scale;
-    scale = (flMode == FileMode::Input) ? 1 : 2;
+    float scale = 2;
     GLfloat small, big;
 
     small = (minX > minY) ? (minY > minZ) ? minZ : minY : (minX > minZ) ? minZ : minX;
     big = (maxX > maxY) ? (maxX > maxZ) ? maxX : maxZ : (maxY > maxZ) ? maxY : maxZ;
-    printf("%f, %f\n", minZ, maxZ);
+    printf("%f, %f, %f, %f,%f, %f\n", minX, maxX, minY, maxY, minZ, maxZ);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -362,6 +363,7 @@ void RenderScene()
         glRotatef(rotateX, 1, 0, 0);
         glRotatef(rotateY, 0, 1, 0);
         glRotatef(0, 0, 0, 1);
+        glScalef(scaling, scaling, scaling);
 
         glPushMatrix();
         DrawObj();
@@ -387,6 +389,7 @@ void myKeyboard(unsigned char key, int x, int y)
     case 'r':
         translateX = translateY = 0;
         rotateX = rotateY = 0;
+        scaling = 1;
         break;
     case 'a':
         rotateY -= shift;
@@ -399,6 +402,14 @@ void myKeyboard(unsigned char key, int x, int y)
         break;
     case 's':
         rotateX += shift;
+        break;
+    case '+':
+        if(scaling < 5)
+            scaling += 0.5;
+        break;
+    case '-':
+        if (scaling > 0.5)
+            scaling -= 0.5;
         break;
     default:
         break;
@@ -454,6 +465,7 @@ void myMenu(int index)
 
 void fileMenu(int index)
 {
+    scaling = 1;
     switch (index)
     {
     case FileMode::ground:
@@ -470,6 +482,7 @@ void fileMenu(int index)
         break;
     case FileMode::Input:
         flMode = FileMode::Input;
+        scaling = 2;
         break;
     default:
         break;
